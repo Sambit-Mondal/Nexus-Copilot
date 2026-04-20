@@ -1,0 +1,94 @@
+version: '3.13'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: nexus-api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - INGESTION_SERVICE_HOST=ingestion-worker
+      - INGESTION_SERVICE_PORT=50051
+      - ENVIRONMENT=development
+      - LOG_LEVEL=info
+    depends_on:
+      redis:
+        condition: service_healthy
+      ingestion-worker:
+        condition: service_started
+    networks:
+      - nexus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ingestion-worker:
+    build:
+      context: .
+      dockerfile: ingestion-worker/Dockerfile
+    container_name: nexus-ingestion-worker
+    expose:
+      - "50051"
+    ports:
+      - "50051:50051"
+    environment:
+      - GRPC_PORT=50051
+      - ENVIRONMENT=development
+      - LOG_LEVEL=info
+    networks:
+      - nexus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "grpcurl", "-plaintext", "localhost:50051", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: nexus-client
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api-gateway:8000
+      - NEXT_PUBLIC_ENVIRONMENT=development
+    depends_on:
+      api-gateway:
+        condition: service_started
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  nexus-network:
+    driver: bridge
