@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package nexus.document_service;
+
+option go_package = "github.com/sambit-mondal/nexus-copilot/pb/document_service";
+option java_multiple_files = true;
+option java_package = "com.nexus.document_service";
+option java_outer_classname = "DocumentServiceProto";
+
+// DocumentRequest represents the request to ingest and process a document
+message DocumentRequest {
+  string file_path = 1;      // Local or S3 path to the document
+  string document_id = 2;    // Unique identifier for the document
+  string client_id = 3;      // Client identifier for segmentation
+}
+
+// ProcessingStatus represents the current status of document processing
+message ProcessingStatus {
+  string task_id = 1;                    // Unique identifier for this processing task
+  string status = 2;                     // Status: CHUNKING, EMBEDDING, INDEXING, COMPLETED, ERROR
+  float progress_percentage = 3;         // Progress: 0.0 to 100.0
+  string message = 4;                    // Optional status message for debugging
+  string error_message = 5;              // Optional error message if status is ERROR
+}
+
+// DocumentIngester service handles the document ingestion pipeline
+service DocumentIngester {
+  // ProcessDocument accepts a document and streams back processing status updates
+  rpc ProcessDocument(DocumentRequest) returns (stream ProcessingStatus);
+}
