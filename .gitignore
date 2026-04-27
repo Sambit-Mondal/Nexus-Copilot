@@ -142,5 +142,8 @@ vite.config.ts.timestamp-*
 
 api-gateway/app/pb/document_service_pb2.pyc
 api-gateway/app/pb/__pycache__/
+api-gateway/app/__pycache__/
 ingestion-worker/pb/*
 ingestion-worker/__pycache__/
+
+/venv*
