@@ -43,14 +43,10 @@ export interface StreamingChunk {
 
 export interface HealthCheckResponse {
   status: 'healthy' | 'degraded' | 'unhealthy';
-  services: {
-    embedding: boolean;
-    llm: boolean;
-    cache: boolean;
-    retriever: boolean;
-    grpc: boolean;
-  };
-  timestamp: string;
+  redis: string;
+  grpc: string;
+  pinecone: string;
+  timestamp?: string;
 }
 
 export interface Message {

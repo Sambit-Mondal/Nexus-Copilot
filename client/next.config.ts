@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   /* Production-ready configuration */
   reactStrictMode: true,
 
-  /* Enable optimized builds */
-  swcMinify: true,
-
   /* API configuration */
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",

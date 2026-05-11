@@ -81,30 +81,22 @@ export const HealthCheck: React.FC<HealthCheckProps> = ({
               : '❌ Service Error'}
         </p>
         <p className="text-xs opacity-75 mt-1">
-          Last checked: {new Date(health.timestamp).toLocaleTimeString()}
+          {health.timestamp && `Last checked: ${new Date(health.timestamp).toLocaleTimeString()}`}
         </p>
       </div>
 
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
-          <span>Embedding</span>
-          <span>{getStatusIcon(health.services.embedding)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>LLM (Groq)</span>
-          <span>{getStatusIcon(health.services.llm)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Cache (Redis)</span>
-          <span>{getStatusIcon(health.services.cache)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Retriever (Pinecone)</span>
-          <span>{getStatusIcon(health.services.retriever)}</span>
+          <span>Redis Cache</span>
+          <span>{getStatusIcon(health.redis === 'connected')}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>gRPC Worker</span>
-          <span>{getStatusIcon(health.services.grpc)}</span>
+          <span>{getStatusIcon(health.grpc === 'ready')}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span>Pinecone Retriever</span>
+          <span>{getStatusIcon(health.pinecone === 'connected')}</span>
         </div>
       </div>
     </div>
