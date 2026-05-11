@@ -77,11 +77,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://api-gateway:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000 
       - NEXT_PUBLIC_ENVIRONMENT=development
     depends_on:
       api-gateway:
-        condition: service_started
+        condition: service_healthy
     networks:
       - nexus-network
     restart: unless-stopped
