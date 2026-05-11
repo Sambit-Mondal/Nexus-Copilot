@@ -78,7 +78,7 @@ async def startup_event():
     logger.info(f"gRPC target: {settings.grpc_url}")
     logger.info(f"Redis: {settings.redis_host}:{settings.redis_port}")
     logger.info(f"Pinecone index: {settings.pinecone_index_name}")
-    logger.info(f"LLM model: {settings.openai_model}")
+    logger.info(f"LLM model: {settings.groq_model}")
     logger.info(f"Embedding model: {settings.embedding_model}")
     logger.info(f"Cache TTL: {settings.redis_cache_ttl}s")
     logger.info(f"Similarity threshold: {settings.similarity_threshold}")

@@ -5,8 +5,8 @@ Handles prompt generation, streaming responses, and error handling.
 
 from typing import AsyncGenerator, List, Optional
 from langchain_groq import ChatGroq
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
 from app.config import settings
 from app.logger import get_logger
 from app.exceptions import LLMError

@@ -2,8 +2,16 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 import warnings
+import sys
 
-import document_service_pb2 as document__service__pb2
+# Attempt to import document_service_pb2 with graceful fallback
+document__service__pb2 = None
+_import_failed = False
+
+try:
+    from . import document_service_pb2 as document__service__pb2
+except (ImportError, ModuleNotFoundError) as e:
+    _import_failed = True
 
 GRPC_GENERATED_VERSION = '1.80.0'
 GRPC_VERSION = grpc.__version__
@@ -35,6 +43,9 @@ class DocumentIngesterStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        if document__service__pb2 is None:
+            raise RuntimeError("document_service_pb2 module not available. Please check proto file is compiled.")
+        
         self.ProcessDocument = channel.unary_stream(
                 '/nexus.document_service.DocumentIngester/ProcessDocument',
                 request_serializer=document__service__pb2.DocumentRequest.SerializeToString,

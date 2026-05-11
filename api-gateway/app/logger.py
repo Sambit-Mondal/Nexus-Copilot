@@ -50,7 +50,7 @@ def get_logger(name: str, log_level: str = "INFO") -> logging.Logger:
         Configured logger instance
     """
     logger = logging.getLogger(name)
-    logger.setLevel(log_level)
+    logger.setLevel(log_level.upper())
 
     # Remove existing handlers to avoid duplicates
     logger.handlers = []
