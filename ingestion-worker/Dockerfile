@@ -10,15 +10,11 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy proto files from api-gateway
-COPY api-gateway/app/pb ./pb
+# Copy entire ingestion-worker directory (includes pb folder)
+COPY ingestion-worker/ .
 
 # Copy requirements and install dependencies
-COPY ingestion-worker/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY ingestion-worker/ .
 
 # Create temp directory for processing
 RUN mkdir -p /tmp/nexus-ingestion
