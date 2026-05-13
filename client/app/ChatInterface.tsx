@@ -57,12 +57,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       abortControllerRef.current = new AbortController();
 
       try {
+        let finalResponse = '';
+        let finalCitations: Citation[] = [];
+        
         await new Promise<void>((resolve, reject) => {
           streamQuery(sessionId, userQuery, {
             onChunk: (chunk: string) => {
+              finalResponse += chunk;
               setCurrentResponse((prev) => prev + chunk);
             },
             onCitation: (citations: Citation[]) => {
+              finalCitations = citations;
               setCurrentCitations(citations);
             },
             onComplete: () => {
@@ -75,12 +80,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           });
         });
 
-        // Add assistant message
+        // Add assistant message with collected data
         const assistantMessage: Message = {
           id: `msg_${Date.now()}_assistant`,
           role: 'assistant',
-          content: currentResponse,
-          citations: currentCitations,
+          content: finalResponse,
+          citations: finalCitations,
           timestamp: new Date(),
         };
 
@@ -96,7 +101,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         abortControllerRef.current = null;
       }
     },
-    [inputValue, isLoading, sessionId, currentResponse, currentCitations, onError]
+    [inputValue, isLoading, sessionId, onError]
   );
 
   const handleCancel = useCallback(() => {

@@ -67,7 +67,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
         // Update progress
         const updatedProgress: UploadProgress = {
-          documentId: data.document_id,
+          documentId: data.upload_id,
           filename: file.name,
           status: 'processing',
           progress: 50,
@@ -78,14 +78,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
         // Poll for processing completion
         await pollProcessingStatus(
-          data.document_id,
+          data.upload_id,
           fileKey,
           file.name,
           onUploadProgress,
           setUploads
         );
 
-        onUploadComplete(data.document_id);
+        onUploadComplete(data.upload_id);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Upload failed';
@@ -130,7 +130,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             documentId,
             filename,
             status: data.status,
-            progress: data.progress || 75 + Math.min(attempts / maxAttempts * 25, 24),
+            progress: data.progress?.percent ?? (75 + Math.min(attempts / maxAttempts * 25, 24)),
           };
 
           setUploads((prev) => new Map(prev).set(fileKey, progress));

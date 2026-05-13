@@ -12,7 +12,9 @@ RUN npm ci
 # Copy application code
 COPY client/ .
 
-# Build the application
+# Build the application with API URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # Expose port

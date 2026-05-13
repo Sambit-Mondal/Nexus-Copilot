@@ -54,9 +54,42 @@ export function streamQuery(
         config.onComplete();
       }
     } catch (error) {
+      console.error('Failed to parse chunk:', error, 'data:', (event as MessageEvent).data);
       config.onError(
         new Error(`Failed to parse streaming response: ${error}`)
       );
+    }
+  });
+
+  // Fallback: also listen to generic 'message' events
+  eventSource.addEventListener('message', (event: Event) => {
+    try {
+      const typedEvent = event as MessageEvent;
+      const data = JSON.parse(typedEvent.data) as StreamingChunk;
+      config.onChunk(data.chunk);
+
+      if (data.citations && data.citations.length > 0) {
+        config.onCitation(data.citations);
+      }
+
+      if (data.isComplete) {
+        eventSource.close();
+        config.onComplete();
+      }
+    } catch (error) {
+      // Ignore parse errors for message events
+    }
+  });
+
+  eventSource.addEventListener('citations', (event: Event) => {
+    try {
+      const typedEvent = event as MessageEvent;
+      const data = JSON.parse(typedEvent.data);
+      if (data.sources && Array.isArray(data.sources)) {
+        config.onCitation(data.sources);
+      }
+    } catch (error) {
+      console.error('Failed to parse citations:', error);
     }
   });
 
