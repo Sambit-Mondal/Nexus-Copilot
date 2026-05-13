@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = ConfigDict(env_file=".env", case_sensitive=False)
     
     # gRPC Server
-    grpc_host: str = "127.0.0.1"
+    grpc_host: str = "0.0.0.0"
     grpc_port: int = 50051
     
     # Pinecone
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     pinecone_region: str = "us-east-1"
     
     # Embeddings
-    embedding_model: str = "tfidf"
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     embedding_batch_size: int = 32
     
     # Document Processing

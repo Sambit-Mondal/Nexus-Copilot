@@ -13,8 +13,8 @@ langchain-text-splitters==1.1.2
 langchain-core==1.3.3
 langchain-community==0.4.1
 
-# Embeddings & Vector DB (lightweight for testing)
-scikit-learn==1.8.0
+# Embeddings & Vector DB
+sentence-transformers==5.4.1
 pinecone==9.0.0
 
 # Utilities
