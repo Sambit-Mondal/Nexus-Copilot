@@ -31,11 +31,16 @@ services:
       - INGESTION_SERVICE_PORT=50051
       - ENVIRONMENT=development
       - LOG_LEVEL=INFO
+      - HF_TOKEN=${HF_TOKEN}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=${GROQ_MODEL}
     depends_on:
       redis:
         condition: service_healthy
       ingestion-worker:
         condition: service_started
+    volumes:
+      - nexus_uploads:/app/data/uploads
     networks:
       - nexus-network
     restart: unless-stopped
@@ -55,10 +60,15 @@ services:
       - "50051"
     ports:
       - "50051:50051"
+    env_file:
+      - .env
     environment:
       - GRPC_PORT=50051
       - ENVIRONMENT=development
       - LOG_LEVEL=info
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - nexus_uploads:/app/data/uploads
     networks:
       - nexus-network
     restart: unless-stopped
@@ -73,11 +83,13 @@ services:
     build:
       context: .
       dockerfile: client/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
     container_name: nexus-client
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000 
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
       - NEXT_PUBLIC_ENVIRONMENT=development
     depends_on:
       api-gateway:
@@ -88,6 +100,7 @@ services:
 
 volumes:
   redis_data:
+  nexus_uploads:
 
 networks:
   nexus-network:
