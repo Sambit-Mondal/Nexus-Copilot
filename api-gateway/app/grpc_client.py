@@ -115,25 +115,26 @@ class GRPCClient:
             logger.info(f"Starting document processing via gRPC: {document_id}")
 
             # Import proto message types
-            from app.pb.document_service_pb2 import IngestRequest
+            from app.pb.document_service_pb2 import DocumentRequest
 
-            # Create request
-            request = IngestRequest(
+            # Create request with correct field names
+            request = DocumentRequest(
+                file_path=file_path,
                 document_id=document_id,
-                s3_url=file_path,
                 client_id=client_id or "unknown",
             )
 
             # Stream responses from gRPC server
             try:
-                async for response in self._stub.IngestDocument(
+                async for response in self._stub.ProcessDocument(
                     request,
                     timeout=self.timeout * 10,  # Longer timeout for processing
                 ):
                     yield {
                         "task_id": response.task_id,
                         "status": response.status,
-                        "progress": float(response.progress),
+                        "progress": float(response.progress_percentage),
+                        "message": response.message,
                     }
 
                 logger.info(f"Document processing completed: {document_id}")

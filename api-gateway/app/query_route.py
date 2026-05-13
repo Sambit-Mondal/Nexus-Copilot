@@ -17,7 +17,13 @@ router = APIRouter()
 
 
 @router.post("/api/v1/query", tags=["RAG"])
-async def query_endpoint(request: QueryRequest):
+@router.get("/api/v1/query", tags=["RAG"])
+async def query_endpoint(
+    query: str = None,
+    session_id: str = None,
+    stream: bool = True,
+    request: Request = None,
+):
     """
     RAG Query Endpoint - Processes user queries with semantic caching and streaming.
 
@@ -53,7 +59,9 @@ async def query_endpoint(request: QueryRequest):
     data: {}
 
     Args:
-        request: QueryRequest with query, session_id, and include_citations
+        query: User query string
+        session_id: Session identifier
+        stream: Whether to stream response
 
     Returns:
         StreamingResponse with SSE events
@@ -62,8 +70,20 @@ async def query_endpoint(request: QueryRequest):
         HTTPException: If query processing fails
     """
     try:
+        # Handle both GET and POST requests
+        if request.method == "POST":
+            body = await request.json()
+            query = body.get("query") or query
+            session_id = body.get("session_id") or session_id
+            include_citations = body.get("include_citations", True)
+        else:
+            include_citations = True
+        
+        if not query or not session_id:
+            raise HTTPException(status_code=400, detail="Missing query or session_id")
+        
         logger.info(
-            f"Query endpoint called (session: {request.session_id}, query: {request.query[:100]}...)"
+            f"Query endpoint called (session: {session_id}, query: {query[:100]}...)"
         )
 
         # Get RAG pipeline
@@ -73,9 +93,9 @@ async def query_endpoint(request: QueryRequest):
             """Generate SSE events from RAG pipeline."""
             try:
                 async for response in rag_pipeline.process_query(
-                    query=request.query,
-                    session_id=request.session_id,
-                    include_citations=request.include_citations,
+                    query=query,
+                    session_id=session_id,
+                    include_citations=include_citations,
                 ):
                     response_type = response.get("type")
 
@@ -87,10 +107,9 @@ async def query_endpoint(request: QueryRequest):
                     elif response_type == "chunk":
                         # Send content chunk
                         yield f"event: chunk\n"
-                        yield f'data: {json.dumps(response.get("content"))}\n\n'
+                        yield f'data: {json.dumps({"chunk": response.get("content")})}\n\n'
 
                     elif response_type == "citations":
-                        # Send citations
                         yield f"event: citations\n"
                         yield f'data: {json.dumps({"sources": response.get("sources")})}\n\n'
 
@@ -120,6 +139,9 @@ async def query_endpoint(request: QueryRequest):
             headers={
                 "Cache-Control": "no-cache",
                 "X-Accel-Buffering": "no",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
             },
         )
 

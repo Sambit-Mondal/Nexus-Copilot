@@ -16,12 +16,12 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     # gRPC Configuration
-    grpc_host: str = "localhost"
+    grpc_host: str = "ingestion-worker"
     grpc_port: int = 50051
     grpc_timeout: int = 30
 
     # Redis Configuration
-    redis_host: str = "localhost"
+    redis_host: str = "redis"
     redis_port: int = 6379
     redis_db: int = 0
     redis_url: str = ""
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # Groq Configuration
     groq_api_key: str = ""
-    groq_model: str = "mixtral-8x7b-32768"
+    groq_model: str = "llama-3.1-70b-versatile"
     groq_temperature: float = 0.7
 
     # Embedding Configuration
