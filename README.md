@@ -604,7 +604,7 @@ We welcome contributions! Please:
 
 ## License
 
-Licensed under the **MIT License**. See [LICENSE](./LICENSE) for details.
+Licensed under the **Apache 2.0 License**. See [LICENSE](./LICENSE) for details.
 
 ---
 
