@@ -36,6 +36,7 @@ class RAGPipeline:
         query: str,
         session_id: str,
         include_citations: bool = True,
+        allow_general_knowledge: bool = True,
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """
         Process a user query through the complete RAG pipeline.
@@ -55,6 +56,7 @@ class RAGPipeline:
             query: User's question
             session_id: Session identifier
             include_citations: Whether to include source citations
+            allow_general_knowledge: Whether to allow AI to use its own knowledge for analysis
 
         Yields:
             Response chunks and metadata as streaming JSON-like dicts
@@ -114,23 +116,34 @@ class RAGPipeline:
             logger.debug("Retrieving context from Pinecone")
             chunks = self.retriever.retrieve(query_embedding)
 
-            if not chunks:
-                logger.warning(f"No context retrieved for query: {query}")
-                yield {
-                    "type": "chunk",
-                    "content": "I don't have any relevant documents to answer this query. ",
-                }
-                yield {
-                    "type": "done",
-                    "cached": False,
-                }
-                return
+            # Step 5: Build prompt - use appropriate mode based on allow_general_knowledge
+            context = ""
+            has_document_context = bool(chunks)
+            
+            if has_document_context:
+                logger.info(f"Retrieved {len(chunks)} context chunks")
+                context = self.llm_service.format_context(chunks)
+            else:
+                logger.warning(f"No document context retrieved for query: {query}")
+                # For queries without documents, only allow general knowledge if enabled
+                if not allow_general_knowledge:
+                    logger.info("No context and general knowledge disabled - returning limited response")
+                    yield {
+                        "type": "chunk",
+                        "content": "I don't have any relevant documents to answer this query. ",
+                    }
+                    yield {
+                        "type": "done",
+                        "cached": False,
+                    }
+                    return
+                context = ""  # Empty context will use general knowledge
 
-            logger.info(f"Retrieved {len(chunks)} context chunks")
-
-            # Step 5: Build prompt
-            context = self.llm_service.format_context(chunks)
-            prompt = self.llm_service.build_rag_prompt(context, query)
+            prompt = self.llm_service.build_rag_prompt(
+                context, 
+                query,
+                allow_general_knowledge=allow_general_knowledge
+            )
 
             # Step 6: Stream LLM response
             logger.debug("Starting LLM response streaming")
@@ -152,15 +165,16 @@ class RAGPipeline:
                     response=full_response,
                     metadata={
                         "session_id": session_id,
-                        "num_chunks": len(chunks),
+                        "num_chunks": len(chunks) if chunks else 0,
+                        "hybrid_mode": allow_general_knowledge,
                     },
                 )
             except Exception as e:
                 logger.warning(f"Failed to cache response: {str(e)}")
                 # Don't fail the entire query for cache failures
 
-            # Step 8: Yield citations if requested
-            if include_citations:
+            # Step 8: Yield citations if requested and we have document context
+            if include_citations and has_document_context:
                 citations = self.llm_service.extract_citations(chunks)
                 yield {
                     "type": "citations",

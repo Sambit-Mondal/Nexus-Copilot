@@ -22,6 +22,7 @@ async def query_endpoint(
     query: str = None,
     session_id: str = None,
     stream: bool = True,
+    allow_general_knowledge: bool = True,
     request: Request = None,
 ):
     """
@@ -34,12 +35,14 @@ async def query_endpoint(
     4. If cache miss: retrieves context from Pinecone
     5. Streams LLM response token-by-token via Server-Sent Events
     6. Caches query and response for future hits
+    7. Supports hybrid mode: AI can use both documents and general knowledge
 
     Request:
     {
         "query": "What is the risk exposure in tech sector?",
         "session_id": "session-uuid-5678",
-        "include_citations": true
+        "include_citations": true,
+        "allow_general_knowledge": true
     }
 
     Response (200 OK - SSE Stream):
@@ -62,6 +65,7 @@ async def query_endpoint(
         query: User query string
         session_id: Session identifier
         stream: Whether to stream response
+        allow_general_knowledge: Whether AI can use its own knowledge for analysis (default: true)
 
     Returns:
         StreamingResponse with SSE events
@@ -76,6 +80,7 @@ async def query_endpoint(
             query = body.get("query") or query
             session_id = body.get("session_id") or session_id
             include_citations = body.get("include_citations", True)
+            allow_general_knowledge = body.get("allow_general_knowledge", True)
         else:
             include_citations = True
         
@@ -83,7 +88,7 @@ async def query_endpoint(
             raise HTTPException(status_code=400, detail="Missing query or session_id")
         
         logger.info(
-            f"Query endpoint called (session: {session_id}, query: {query[:100]}...)"
+            f"Query endpoint called (session: {session_id}, hybrid_mode: {allow_general_knowledge}, query: {query[:100]}...)"
         )
 
         # Get RAG pipeline
@@ -96,6 +101,7 @@ async def query_endpoint(
                     query=query,
                     session_id=session_id,
                     include_citations=include_citations,
+                    allow_general_knowledge=allow_general_knowledge,
                 ):
                     response_type = response.get("type")
 

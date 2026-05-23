@@ -42,18 +42,42 @@ class LLMService:
             logger.error(f"Failed to initialize LLM: {str(e)}")
             raise LLMError(f"LLM initialization failed: {str(e)}")
 
-    def build_rag_prompt(self, context: str, query: str) -> str:
+    def build_rag_prompt(self, context: str, query: str, allow_general_knowledge: bool = True) -> str:
         """
         Build detailed RAG prompt to prevent hallucinations.
 
         Args:
             context: Retrieved context chunks (concatenated)
             query: User's query
+            allow_general_knowledge: Whether to allow AI to use its own knowledge for analysis
 
         Returns:
             Complete prompt text
         """
-        prompt = f"""You are a professional financial advisor AI system for enterprise clients.
+        if allow_general_knowledge:
+            prompt = f"""You are a professional financial advisor AI system for enterprise clients.
+
+CRITICAL INSTRUCTIONS:
+1. You can use information from the CONTEXT section below as the primary source
+2. For analysis-related questions (financial analysis, risk assessment, investment strategies, market trends, economic concepts, etc.), you MAY ALSO use your general knowledge and expertise to provide comprehensive insights
+3. Always prioritize document context when available, but supplement with professional knowledge when the question is analysis-related
+4. NEVER answer questions outside the financial/investment/analysis domain (e.g., entertainment, sports, general trivia)
+5. If a question is outside scope, respond with: "I'm specialized in financial and investment analysis. I can help you with questions about your documents, risk analysis, portfolio strategies, and financial concepts. How can I assist with your analysis?"
+6. When citing information from documents, always reference the exact source
+7. Be precise with numerical data, dates, and financial figures from documents
+8. For general knowledge insights, clearly indicate they're based on professional expertise, not specific documents
+9. Acknowledge data limitations and uncertainty when appropriate
+
+DOCUMENT CONTEXT (Use as primary source):
+{context}
+
+USER QUERY:
+{query}
+
+RESPONSE:
+Please provide a comprehensive response. Use document information as primary source, supplement with professional analysis knowledge when relevant to the query, and reject out-of-scope questions."""
+        else:
+            prompt = f"""You are a professional financial advisor AI system for enterprise clients.
 
 CRITICAL INSTRUCTIONS:
 1. You MUST ONLY use information explicitly provided in the CONTEXT section below
