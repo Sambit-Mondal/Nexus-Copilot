@@ -112,16 +112,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-gradient-to-b from-[#0a0a0a] to-[#121212]">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="text-4xl mb-4">💬</div>
-              <p className="text-lg font-medium">Start a conversation</p>
-              <p className="text-sm mt-2">
-                Ask about your documents or get financial insights
+              <div className="text-6xl mb-6 animate-pulse-glow">💬</div>
+              <p className="text-xl font-semibold text-white mb-3">Start a conversation</p>
+              <p className="text-sm text-gray-400 max-w-xs">
+                Ask about your documents or get financial insights powered by AI
               </p>
             </div>
           </div>
@@ -130,25 +130,39 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${
+                className={`flex gap-3 ${
                   message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                } animate-slide-in-up`}
               >
-                <div
-                  className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white rounded-br-none'
-                      : 'bg-gray-100 text-gray-900 rounded-bl-none'
-                  }`}
-                >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                {/* Avatar - Assistant */}
+                {message.role === 'assistant' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold text-sm">
+                    🤖
+                  </div>
+                )}
+
+                {/* Message Content */}
+                <div className="flex flex-col gap-2 max-w-xs lg:max-w-md xl:max-w-lg">
+                  <div
+                    className={`px-4 py-3 rounded-2xl ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-br-none shadow-lg'
+                        : 'bg-[#1a1a1a] text-gray-100 rounded-bl-none border border-[rgba(255,255,255,0.08)]'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                  </div>
+
+                  {/* Citations at the end */}
                   {message.citations && message.citations.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-opacity-20 border-gray-500">
-                      <div className="text-xs opacity-75 space-y-1">
+                    <div className="px-1 space-y-1">
+                      <p className="text-xs text-gray-500 font-medium">Sources:</p>
+                      <div className="flex flex-wrap gap-2">
                         {message.citations.map((citation, idx) => (
                           <div
                             key={idx}
-                            className="inline-block bg-opacity-20 bg-gray-700 px-2 py-1 rounded mr-1 mb-1"
+                            className="text-xs px-2 py-1 rounded-full bg-[rgba(16,185,129,0.15)] border border-[rgba(16,185,129,0.3)] text-emerald-300 hover:bg-[rgba(16,185,129,0.25)] transition"
+                            title={`Page ${citation.page_number || 'N/A'} - ${Math.round(citation.confidence * 100)}% confidence`}
                           >
                             📄 {citation.filename}
                           </div>
@@ -157,26 +171,41 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
                   )}
                 </div>
+
+                {/* Avatar - User */}
+                {message.role === 'user' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                    👤
+                  </div>
+                )}
               </div>
             ))}
 
             {/* Current streaming response */}
             {isLoading && currentResponse && (
-              <div className="flex justify-start">
-                <div className="max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg bg-gray-100 text-gray-900 rounded-bl-none">
-                  <p className="text-sm leading-relaxed">{currentResponse}</p>
-                  <div className="mt-2 flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+              <div className="flex gap-3 justify-start animate-slide-in-up">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold text-sm">
+                  🤖
+                </div>
+                <div className="flex flex-col gap-2 max-w-xs lg:max-w-md xl:max-w-lg">
+                  <div className="max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-2xl bg-[#1a1a1a] text-gray-100 rounded-bl-none border border-[rgba(255,255,255,0.08)]">
+                    <p className="text-sm leading-relaxed">{currentResponse}</p>
+                    <div className="mt-2 flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots"></div>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots delay-100"></div>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots delay-200"></div>
+                    </div>
                   </div>
+
+                  {/* Citations at the end */}
                   {currentCitations && currentCitations.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-opacity-20 border-gray-500">
-                      <div className="text-xs opacity-75 space-y-1">
+                    <div className="px-1 space-y-1">
+                      <p className="text-xs text-gray-500 font-medium">Sources:</p>
+                      <div className="flex flex-wrap gap-2">
                         {currentCitations.map((citation, idx) => (
                           <div
                             key={idx}
-                            className="inline-block bg-opacity-20 bg-gray-700 px-2 py-1 rounded mr-1 mb-1"
+                            className="text-xs px-2 py-1 rounded-full bg-[rgba(16,185,129,0.15)] border border-[rgba(16,185,129,0.3)] text-emerald-300"
                           >
                             📄 {citation.filename}
                           </div>
@@ -189,12 +218,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             )}
 
             {isLoading && !currentResponse && (
-              <div className="flex justify-start">
-                <div className="px-4 py-3 rounded-lg bg-gray-100 text-gray-900 rounded-bl-none">
+              <div className="flex gap-3 justify-start animate-slide-in-up">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold text-sm">
+                  🤖
+                </div>
+                <div className="px-4 py-3 rounded-2xl bg-[#1a1a1a] text-gray-100 rounded-bl-none border border-[rgba(255,255,255,0.08)]">
                   <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots delay-100"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-typing-dots delay-200"></div>
                   </div>
                 </div>
               </div>
@@ -206,7 +238,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-6 bg-white">
+      <div className="border-t border-[rgba(255,255,255,0.08)] p-6 bg-[#121212] backdrop-blur-sm">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex gap-3">
             <input
@@ -215,13 +247,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask a question about your documents..."
               disabled={isLoading}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.12)] text-white rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed placeholder-gray-500 transition-all"
             />
             {isLoading ? (
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+                className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium shadow-lg"
               >
                 Cancel
               </button>
@@ -229,14 +261,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
                 Send
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-500">
-            Responses are generated in real-time using your documents as context
+          <p className="text-xs text-gray-500 text-center">
+            Responses are powered by your documents
           </p>
         </form>
       </div>

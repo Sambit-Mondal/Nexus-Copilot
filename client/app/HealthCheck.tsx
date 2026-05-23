@@ -1,6 +1,6 @@
 /**
  * Health Check Component
- * Displays API gateway service status
+ * Displays API gateway service status in a minimal, modern style
  */
 
 import React, { useState, useEffect } from 'react';
@@ -43,16 +43,16 @@ export const HealthCheck: React.FC<HealthCheckProps> = ({
 
   if (loading) {
     return (
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm text-gray-500">Checking service status...</p>
+      <div className="p-4 bg-[#1a1a1a] rounded-lg border border-[rgba(255,255,255,0.08)]">
+        <p className="text-sm text-gray-400 animate-pulse">Checking service status...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-        <p className="text-sm text-red-700">⚠️ {error}</p>
+      <div className="p-4 bg-[#1a1a1a] rounded-lg border border-[rgba(239,68,68,0.3)]">
+        <p className="text-sm text-red-400">⚠️ Service unavailable</p>
       </div>
     );
   }
@@ -61,42 +61,34 @@ export const HealthCheck: React.FC<HealthCheckProps> = ({
     return null;
   }
 
-  const getStatusIcon = (status: boolean) => (status ? '✅' : '❌');
-  const getStatusColor = (status: string) => {
-    if (status === 'healthy') return 'bg-green-50 border-green-200 text-green-700';
-    if (status === 'degraded') return 'bg-yellow-50 border-yellow-200 text-yellow-700';
-    return 'bg-red-50 border-red-200 text-red-700';
+  const getStatusDot = (status: string) => {
+    switch (status) {
+      case 'connected':
+      case 'ready':
+        return '🟢';
+      case 'disconnected':
+      case 'error':
+        return '🔴';
+      default:
+        return '🟡';
+    }
   };
 
   return (
-    <div
-      className={`p-4 rounded-lg border ${getStatusColor(health.status)}`}
-    >
-      <div className="mb-3">
-        <p className="font-semibold text-sm">
-          {health.status === 'healthy'
-            ? '✅ All Services Healthy'
-            : health.status === 'degraded'
-              ? '⚠️ Degraded Service'
-              : '❌ Service Error'}
-        </p>
-        <p className="text-xs opacity-75 mt-1">
-          {health.timestamp && `Last checked: ${new Date(health.timestamp).toLocaleTimeString()}`}
-        </p>
-      </div>
-
+    <div className="p-4 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#1a1a1a]">
+      <p className="text-xs font-semibold text-gray-300 mb-3">Service Status</p>
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
-          <span>Redis Cache</span>
-          <span>{getStatusIcon(health.redis === 'connected')}</span>
+          <span className="text-gray-400">Redis</span>
+          <span className="text-xl">{getStatusDot(health.redis)}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span>gRPC Worker</span>
-          <span>{getStatusIcon(health.grpc === 'ready')}</span>
+          <span className="text-gray-400">gRPC</span>
+          <span className="text-xl">{getStatusDot(health.grpc)}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span>Pinecone Retriever</span>
-          <span>{getStatusIcon(health.pinecone === 'connected')}</span>
+          <span className="text-gray-400">Pinecone</span>
+          <span className="text-xl">{getStatusDot(health.pinecone)}</span>
         </div>
       </div>
     </div>

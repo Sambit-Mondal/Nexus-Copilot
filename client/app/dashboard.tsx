@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ChatInterface from './ChatInterface';
 import DocumentUpload from './DocumentUpload';
-import HealthCheck from './HealthCheck';
 import ErrorToast from './ErrorToast';
 import { UploadProgress } from './types';
 import { generateSessionId } from './api';
@@ -11,7 +10,7 @@ import { generateSessionId } from './api';
 export default function Dashboard() {
   const [sessionId, setSessionId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [recentUploads, setRecentUploads] = useState<Set<string>>(new Set());
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [apiUrl] = useState(
     process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
   );
@@ -26,13 +25,12 @@ export default function Dashboard() {
   }, []);
 
   const handleUploadProgress = useCallback((progress: UploadProgress) => {
-    if (progress.status === 'completed') {
-      setRecentUploads((prev) => new Set(prev).add(progress.documentId));
-    }
     console.log(`Upload progress: ${progress.filename} - ${progress.progress}%`);
   }, []);
 
   const handleUploadComplete = useCallback((documentId: string) => {
+    setSuccessMessage('📄 Document ready for analysis');
+    setTimeout(() => setSuccessMessage(null), 4000);
     console.log(`Upload completed: ${documentId}`);
   }, []);
 
@@ -45,10 +43,14 @@ export default function Dashboard() {
     setError(null);
   }, []);
 
+  const dismissSuccess = useCallback(() => {
+    setSuccessMessage(null);
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#0a0a0a]">
       {/* Left Side: Chat Interface */}
-      <div className="flex-1 flex flex-col border-r border-gray-200 overflow-hidden">
+      <div className="flex-1 flex flex-col border-r border-[rgba(255,255,255,0.08)] overflow-hidden">
         <div className="flex-1 overflow-hidden">
           {sessionId && (
             <ChatInterface sessionId={sessionId} onError={handleError} />
@@ -56,8 +58,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Right Side: Document Upload + Status */}
-      <div className="w-80 flex flex-col border-l border-gray-200 bg-white overflow-hidden">
+      {/* Right Side: Document Upload */}
+      <div className="w-80 flex flex-col border-l border-[rgba(255,255,255,0.08)] bg-[#121212] overflow-hidden">
         {/* Upload Panel */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {sessionId && (
@@ -69,37 +71,30 @@ export default function Dashboard() {
             />
           )}
         </div>
-
-        {/* Status Panel */}
-        <div className="border-t border-gray-200 p-6 bg-gray-50 space-y-4">
-          <HealthCheck apiUrl={apiUrl} />
-
-          {/* Session Info */}
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-xs font-semibold text-blue-700 mb-2">
-              Session Info
-            </p>
-            <p className="text-xs text-blue-600 break-all font-mono">
-              {sessionId.substring(0, 20)}...
-            </p>
-          </div>
-
-          {/* Quick Stats */}
-          {recentUploads.size > 0 && (
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <p className="text-xs font-semibold text-green-700">
-                ✅ {recentUploads.size} Document{recentUploads.size !== 1 ? 's' : ''}
-              </p>
-              <p className="text-xs text-green-600 mt-1">Ready for analysis</p>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Error Toast */}
       {error && (
         <div className="fixed bottom-6 left-6 right-auto max-w-sm z-50">
           <ErrorToast message={error} onDismiss={dismissError} />
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {successMessage && (
+        <div className="fixed bottom-6 left-6 right-auto max-w-sm z-50">
+          <div className="p-4 bg-[#1a1a1a] border border-[rgba(16,185,129,0.3)] rounded-xl text-emerald-400 flex items-start gap-3 backdrop-blur-sm shadow-lg animate-slide-in-up">
+            <span className="text-xl flex-shrink-0">✅</span>
+            <div className="flex-1">
+              <p className="font-medium text-sm">{successMessage}</p>
+            </div>
+            <button
+              onClick={dismissSuccess}
+              className="text-emerald-400/60 hover:text-emerald-400 text-xl transition-colors"
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
     </div>

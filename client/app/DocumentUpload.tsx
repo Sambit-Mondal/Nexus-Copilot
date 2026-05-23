@@ -197,36 +197,36 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   );
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-[#121212] overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900">Documents</h2>
-        <p className="text-sm text-gray-500 mt-1">
+      <div className="p-6 border-b border-[rgba(255,255,255,0.08)]">
+        <h2 className="text-xl font-bold text-white">Documents</h2>
+        <p className="text-sm text-gray-400 mt-1">
           Upload PDFs to include in your analysis
         </p>
       </div>
 
       {/* Upload Area */}
-      <div className="flex-shrink-0 p-6 border-b border-gray-200">
+      <div className="flex-shrink-0 p-6 border-b border-[rgba(255,255,255,0.08)]">
         <div
           ref={dragRef}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition hover:border-blue-400 hover:bg-blue-50"
+          className="border-2 border-dashed border-[rgba(16,185,129,0.2)] rounded-2xl p-8 text-center cursor-pointer transition hover:border-emerald-500 hover:bg-emerald-500/10"
           onClick={() => fileInputRef.current?.click()}
         >
           <div className="space-y-2">
-            <div className="text-3xl">📁</div>
+            <div className="text-3xl animate-pulse-glow">📁</div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-white">
                 Drag & drop your PDFs
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 or click to select files
               </p>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-500">
               Max 50MB per file. PDF format only.
             </p>
           </div>
@@ -244,43 +244,43 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       {/* Uploads List */}
       <div className="flex-1 overflow-y-auto p-6">
         {uploads.size === 0 ? (
-          <div className="text-center text-gray-400 py-8">
+          <div className="text-center text-gray-500 py-8">
             <p className="text-sm">No documents uploaded yet</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {Array.from(uploads.entries()).map(([key, upload]) => (
               <div
                 key={key}
-                className="p-4 border border-gray-200 rounded-lg bg-gray-50"
+                className="p-4 border border-[rgba(255,255,255,0.08)] rounded-xl bg-[#1a1a1a] hover:border-[rgba(255,255,255,0.12)] transition animate-slide-in-up"
               >
                 {/* Filename and Status */}
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">
                       {upload.filename}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1 capitalize">
+                    <p className="text-xs text-gray-400 mt-1 capitalize">
                       {upload.status === 'completed' && '✅ Ready to use'}
                       {upload.status === 'processing' && '⏳ Processing...'}
                       {upload.status === 'uploading' && '📤 Uploading...'}
                       {upload.status === 'failed' && `❌ ${upload.error}`}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-500 ml-2">
+                  <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
                     {Math.round(upload.progress)}%
                   </span>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-[rgba(255,255,255,0.08)] rounded-full h-1.5 overflow-hidden">
                   <div
                     className={`h-full transition-all ${
                       upload.status === 'failed'
                         ? 'bg-red-500'
                         : upload.status === 'completed'
-                          ? 'bg-green-500'
-                          : 'bg-blue-500'
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500'
+                          : 'bg-gradient-to-r from-blue-500 to-emerald-500'
                     }`}
                     style={{ width: `${upload.progress}%` }}
                   />

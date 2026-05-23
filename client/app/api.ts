@@ -11,6 +11,7 @@ export interface StreamConfig {
   onComplete: () => void;
   onError: (error: Error) => void;
   signal?: AbortSignal;
+  allowGeneralKnowledge?: boolean;
 }
 
 /**
@@ -27,6 +28,7 @@ export function streamQuery(
     query,
     session_id: sessionId,
     stream: 'true',
+    allow_general_knowledge: config.allowGeneralKnowledge !== false ? 'true' : 'false',
   });
 
   const eventSource = new EventSource(`${apiUrl}/api/v1/query?${queryParams}`);
@@ -129,6 +131,7 @@ export async function streamQueryFetch(
         query,
         session_id: sessionId,
         stream: true,
+        allow_general_knowledge: config.allowGeneralKnowledge !== false,
       }),
       signal: config.signal,
     });

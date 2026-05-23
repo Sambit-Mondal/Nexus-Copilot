@@ -1,6 +1,6 @@
 /**
  * Error Toast Component
- * Displays error messages to the user
+ * Displays error messages with smooth animations
  */
 
 import React, { useState, useEffect } from 'react';
@@ -16,20 +16,34 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
   duration = 5000,
   onDismiss,
 }) => {
+  const [isExiting, setIsExiting] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(onDismiss, duration);
+    const timer = setTimeout(() => {
+      setIsExiting(true);
+      setTimeout(onDismiss, 300);
+    }, duration);
     return () => clearTimeout(timer);
   }, [duration, onDismiss]);
 
   return (
-    <div className="animate-in slide-in-from-top fade-in p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-start gap-3">
+    <div
+      className={`p-4 bg-[#1a1a1a] border border-[rgba(239,68,68,0.3)] rounded-xl text-red-400 flex items-start gap-3 backdrop-blur-sm shadow-lg ${
+        isExiting
+          ? 'animate-slide-in-up opacity-0'
+          : 'animate-slide-in-up'
+      }`}
+    >
       <span className="text-xl flex-shrink-0">❌</span>
       <div className="flex-1">
         <p className="font-medium text-sm">{message}</p>
       </div>
       <button
-        onClick={onDismiss}
-        className="text-red-400 hover:text-red-600 text-xl"
+        onClick={() => {
+          setIsExiting(true);
+          setTimeout(onDismiss, 300);
+        }}
+        className="text-red-400/60 hover:text-red-400 text-xl transition-colors"
       >
         ×
       </button>

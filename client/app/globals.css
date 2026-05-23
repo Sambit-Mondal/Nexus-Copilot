@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --background-secondary: #121212;
+  --background-tertiary: #1a1a1a;
+  --foreground: #f5f5f5;
+  --foreground-secondary: #d1d5db;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #10b981;
+  --accent-green: #10b981;
+  --border-color: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
@@ -12,15 +19,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 html {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -34,23 +35,159 @@ body {
   height: 100%;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Dark theme scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Animation utilities */
-@keyframes bounce-custom {
-  0%, 100% {
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Focus ring styling - blue glow effect */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Placeholder text styling */
+::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Animation keyframes */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes typingDots {
+  0%, 20% {
     transform: translateY(0);
+    opacity: 1;
   }
   50% {
-    transform: translateY(-0.5rem);
+    transform: translateY(-8px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-.animate-bounce {
-  animation: bounce 1s infinite;
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom animation utilities */
+.animate-slide-in-right {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-typing-dots {
+  animation: typingDots 0.6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background-size: 1000px 100%;
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 6s ease infinite;
+  background-size: 200% 200%;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.3s ease-out;
 }
 
 .delay-100 {
@@ -61,33 +198,21 @@ html {
   animation-delay: 200ms;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.delay-300 {
+  animation-delay: 300ms;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+/* Glass morphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Focus ring styling */
-:focus-visible {
-  outline: 2px solid rgb(59, 130, 246);
-  outline-offset: 2px;
-}
-
-/* Placeholder text styling */
-::placeholder {
-  color: rgb(156, 163, 175);
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
