@@ -1,4 +1,8 @@
+<div align = "center">
+
 # Nexus Copilot
+
+### Enterprise Advisory Copilot
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache-2.svg)](https://opensource.org/license/Apache-2.0)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/downloads/)
@@ -6,6 +10,13 @@
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://docs.docker.com/compose/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688)](https://fastapi.tiangolo.com/)
 [![gRPC](https://img.shields.io/badge/gRPC-Protocol%20Buffers-244c5a)](https://grpc.io/)
+
+
+**Nexus Copilot is a distributed, production-grade Enterprise Advisory Copilot powered by Retrieval-Augmented Generation (RAG)**
+
+![Nexus Copilot Logo](docs/screenshots/logo.png)
+
+</div>
 
 ---
 
